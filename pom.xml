@@ -108,6 +108,11 @@
             <artifactId>langchain4j-reactor</artifactId>
             <version>1.1.0-beta7</version>
         </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-easy-rag</artifactId>
+            <version>1.1.0-beta7</version>
+        </dependency>
         <!--        redis 会话记忆-->
         <dependency>
             <groupId>dev.langchain4j</groupId>
@@ -127,7 +132,6 @@
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>

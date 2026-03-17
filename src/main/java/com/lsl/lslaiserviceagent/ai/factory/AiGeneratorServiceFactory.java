@@ -10,16 +10,24 @@ import com.lsl.lslaiserviceagent.ai.tool.IpTools;
 import com.lsl.lslaiserviceagent.facade.ChatHistroyFacade;
 import com.lsl.lslaiserviceagent.utils.IpUtils;
 import dev.langchain4j.community.store.memory.chat.redis.RedisChatMemoryStore;
+import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
 import dev.langchain4j.data.message.ToolExecutionResultMessage;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.StreamingChatModel;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 import java.time.Duration;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -32,10 +40,11 @@ public class AiGeneratorServiceFactory {
     @Lazy
     private ChatHistroyFacade chatHistroyFacade;
 
-    private final String SERVICE_CACHE_PREFIX = "lsl-agent-aiservice-cache";
+    private static final String SERVICE_CACHE_PREFIX = "lsl-agent-aiservice-cache";
 
-    private final String SEPERATOR = ":";
+    private static final String SEPERATOR = ":";
 
+    private static final String RAG_DIRECTORY_PATH = "src\\main\\resources\\rag_documents";
 
     public AiGeneratorService getAiCodeGeneratorService(long chatId,String ip) {
         // 通过缓存获取
@@ -56,6 +65,15 @@ public class AiGeneratorServiceFactory {
         StreamingChatModel streamingChatModelPrototype
                 = SpringUtil.getBean(AiConstants.CHAT_AI_BEAN_NAME
                 , StreamingChatModel.class);
+
+        // 1. 加载文档
+
+        List<Document> documents = FileSystemDocumentLoader.loadDocuments(RAG_DIRECTORY_PATH);
+
+        // 2. 创建内存向量存储，并使用内置ingestor处理文档（一切默认！）
+        EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+        EmbeddingStoreIngestor.ingest(documents, embeddingStore); // 魔法在这里
+
         return AiServices.builder(AiGeneratorService.class)
                 .streamingChatModel(streamingChatModelPrototype)
                 .chatMemoryProvider(memoryId -> memory)
@@ -67,6 +85,7 @@ public class AiGeneratorServiceFactory {
                 .maxSequentialToolsInvocations(20)
                 //添加输入护轨
                 .inputGuardrails(new PromptSafetyInputGuardrail())
+                .contentRetriever(EmbeddingStoreContentRetriever.from(embeddingStore))
                 .build();
     }
 
