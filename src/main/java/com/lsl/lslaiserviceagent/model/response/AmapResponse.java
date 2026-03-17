@@ -5,10 +5,16 @@ import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AmapResponse {
+public class AmapResponse implements Serializable {
+
+    //{"status":"1","info":"OK","infocode":"10000","province":"局域网","city":[],"adcode":[],"rectangle":[]}
+    private static final long serialVersionUID = 1L;
 
     /**
      * 返回状态：1为成功，0为失败
@@ -33,18 +39,18 @@ public class AmapResponse {
     /**
      * 城市名称（成功时返回）
      */
-    private String city;
+    private List<String> city;
 
     /**
      * 城市编码（成功时返回）
      */
-    private String adcode;
+    private List<String> adcode;
 
     /**
      * 矩形区域范围（成功时返回）
      * 格式：左下角坐标;右上角坐标
      */
-    private String rectangle;
+    private List<String> rectangle;
 
     /**
      * 国家（部分接口可能返回）

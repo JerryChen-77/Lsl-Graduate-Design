@@ -6,7 +6,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.lsl.lslaiserviceagent.ai.guard.PromptSafetyInputGuardrail;
 import com.lsl.lslaiserviceagent.ai.model.constants.AiConstants;
 import com.lsl.lslaiserviceagent.ai.service.AiGeneratorService;
+import com.lsl.lslaiserviceagent.ai.tool.IpTools;
 import com.lsl.lslaiserviceagent.facade.ChatHistroyFacade;
+import com.lsl.lslaiserviceagent.utils.IpUtils;
 import dev.langchain4j.community.store.memory.chat.redis.RedisChatMemoryStore;
 import dev.langchain4j.data.message.ToolExecutionResultMessage;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -30,17 +32,20 @@ public class AiGeneratorServiceFactory {
     @Lazy
     private ChatHistroyFacade chatHistroyFacade;
 
-    private final String SERVICE_CACHE_PREFIX = "lsl-agent-aiservice-cache:";
+    private final String SERVICE_CACHE_PREFIX = "lsl-agent-aiservice-cache";
+
+    private final String SEPERATOR = ":";
 
 
-    public AiGeneratorService getAiCodeGeneratorService(long chatId) {
+    public AiGeneratorService getAiCodeGeneratorService(long chatId,String ip) {
         // 通过缓存获取
-        return serviceCache.get(buildKey(chatId), this::createAiCodeGeneratorService);
+        return serviceCache.get(buildKey(chatId,ip), this::createAiCodeGeneratorService);
     }
 
     public AiGeneratorService createAiCodeGeneratorService(String key) {
         String[] split = key.split(":");
         Long chatId = Long.valueOf(split[1]);
+        String ip = split[2];
         // 直接创建
         MessageWindowChatMemory memory = MessageWindowChatMemory.builder()
                 .id(chatId)
@@ -55,8 +60,7 @@ public class AiGeneratorServiceFactory {
                 .streamingChatModel(streamingChatModelPrototype)
                 .chatMemoryProvider(memoryId -> memory)
                 //TODO 添加查询根据IP查询地址工具
-//                .tools(new RelationDbTools(datasourceconfigFacade, chatHistroyFacade),
-//                        new RedisTools(chatHistroyFacade,redisOperationService,datasourceconfigService))
+                .tools(new IpTools(new IpUtils(),ip))
                 .hallucinatedToolNameStrategy(toolExecutionRequest -> ToolExecutionResultMessage.from(
                         toolExecutionRequest,"There is no tools called"+ toolExecutionRequest.name()
                 ))
@@ -82,7 +86,7 @@ public class AiGeneratorServiceFactory {
             })
             .build();
 
-    private String buildKey(Long chatId){
-        return SERVICE_CACHE_PREFIX+chatId;
+    private String buildKey(Long chatId,String ip){
+        return SERVICE_CACHE_PREFIX+SEPERATOR+chatId+SEPERATOR+ip;
     }
 }

@@ -1,7 +1,9 @@
 package com.lsl.lslaiserviceagent.ai.service;
 
+import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.TokenStream;
+import dev.langchain4j.service.UserMessage;
 import reactor.core.publisher.Flux;
 
 public interface AiGeneratorService {
@@ -16,5 +18,5 @@ public interface AiGeneratorService {
     String generateCommonAnswer(String userMessage);
 
     @SystemMessage(fromResource = "prompt/answergen-service-hotline-prompt.txt")
-    TokenStream generateCommonAnswerStream(String userMessage);
+    TokenStream generateCommonAnswerStream(@MemoryId Long chatId,@UserMessage String userMessage);
 }

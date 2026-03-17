@@ -20,7 +20,7 @@ import java.util.HashSet;
 public class IpUtils {
 
     @Value("${amap.api.key}")
-    private String amap_key;
+    private static String amap_key = "a76dd99d151f6d5ddaff987770aa3e1f";
 
     // 常见的代理IP头部名称
     private static final String[] IP_HEADERS = {
@@ -38,6 +38,10 @@ public class IpUtils {
         "X-Real-IP"  // Nginx代理专用
     };
 
+    public AmapResponse getAddressBy(HttpServletRequest request) {
+        String currentIp = getClientIp(request);
+        return getAddressByIp(currentIp);
+    }
     /**
      * 获取客户端真实IP地址
      * @param request HttpServletRequest

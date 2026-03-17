@@ -91,7 +91,7 @@ public class ChatHistoryFacadeImpl implements ChatHistroyFacade {
     }
 
     @Override
-    public Flux<String> chat(Long chatId, String message, User loginUser) {
+    public Flux<String> chat(Long chatId, String message, User loginUser, String ip) {
         ThrowUtils.throwIf(StrUtil.isBlank(message), ErrorCode.PARAMS_ERROR, "用户消息不能为空");
         ThrowUtils.throwIf(chatId == null||chatId<0, ErrorCode.NOT_FOUND_ERROR, "对话不存在");
         // 校验完成后保存用户对话
@@ -104,7 +104,7 @@ public class ChatHistoryFacadeImpl implements ChatHistroyFacade {
         chatHistoryService.saveChatMessage(chatHistorySaveRequest);
         chatHistoryOriginalService.addOriginalChatMessage(chatId,message, ChatHistoryMessageTypeEnum.USER.getValue(), loginUser.getId());
         // AI生成对话
-        Flux<String> originFlux = aiGeneratorFacade.generateAiAnswerStream(chatId, message, AiGenTypeEnum.COMMON_CONVERSATION);
+        Flux<String> originFlux = aiGeneratorFacade.generateAiAnswerStream(chatId, message, AiGenTypeEnum.COMMON_CONVERSATION,ip);
         return streamHandlerExecutor.doExecute(originFlux,chatHistoryService,chatHistoryOriginalService,chatId,loginUser,AiGenTypeEnum.COMMON_CONVERSATION);
     }
 }

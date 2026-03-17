@@ -15,6 +15,7 @@ import com.lsl.lslaiserviceagent.model.entity.User;
 import com.lsl.lslaiserviceagent.model.request.chathistory.ChatHistoryQueryRequest;
 import com.lsl.lslaiserviceagent.service.ChatTopicService;
 import com.lsl.lslaiserviceagent.service.UserService;
+import com.lsl.lslaiserviceagent.utils.IpUtils;
 import com.lsl.lslaiserviceagent.utils.ResultUtils;
 import com.lsl.lslaiserviceagent.utils.ThrowUtils;
 import com.mybatisflex.core.paginate.Page;
@@ -48,6 +49,8 @@ public class ChatHistoryController {
     @Autowired
     private ChatTopicService chatTopicService;
 
+    @Resource
+    private IpUtils ipUtils;
     /**
      * 删除指定对话历史记录（仅创建者与管理员可见）
      *
@@ -125,8 +128,9 @@ public class ChatHistoryController {
             chatTopicService.save(newTopic);
             chatId = newTopic.getId();
         }
+        String ip = ipUtils.getClientIp(request);
         // 调用服务生成代码（流式）
-        Flux<String> contentFlux = chatHistroyFacade.chat(chatId, message, loginUser);
+        Flux<String> contentFlux = chatHistroyFacade.chat(chatId, message, loginUser,ip);
         return contentFlux
                 .map(chunk -> {
                     // 包装成json对象

@@ -26,6 +26,7 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class AiGeneratorFacade {
 
+    private static final String LOCAL_IP = "127.0.0.1";
     @Resource
     private AiGeneratorServiceFactory aiGeneratorServiceFactory;
 
@@ -40,7 +41,7 @@ public class AiGeneratorFacade {
         if (aiGenTypeEnum == null) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成类型为空");
         }
-        AiGeneratorService aiGeneratorService = aiGeneratorServiceFactory.getAiCodeGeneratorService(chatId);
+        AiGeneratorService aiGeneratorService = aiGeneratorServiceFactory.getAiCodeGeneratorService(chatId,LOCAL_IP);
         return switch (aiGenTypeEnum) {
             case COMMON_CONVERSATION -> aiGeneratorService.generateCommonAnswer(userMessage);
             default -> {
@@ -50,13 +51,13 @@ public class AiGeneratorFacade {
         };
     }
 
-    public Flux<String> generateAiAnswerStream(long chatId,String userMessage, AiGenTypeEnum aiGenTypeEnum) {
+    public Flux<String> generateAiAnswerStream(long chatId,String userMessage, AiGenTypeEnum aiGenTypeEnum,String ip) {
         if (aiGenTypeEnum == null) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成类型为空");
         }
-        AiGeneratorService aiGeneratorService = aiGeneratorServiceFactory.getAiCodeGeneratorService(chatId);
+        AiGeneratorService aiGeneratorService = aiGeneratorServiceFactory.getAiCodeGeneratorService(chatId,ip);
         return switch (aiGenTypeEnum) {
-            case COMMON_CONVERSATION -> processAiAnswerStream(aiGeneratorService,userMessage);
+            case COMMON_CONVERSATION -> processAiAnswerStream(chatId,aiGeneratorService,userMessage);
             default -> {
                 String errorMessage = "不支持的生成类型：" + aiGenTypeEnum.getValue();
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, errorMessage);
@@ -64,8 +65,8 @@ public class AiGeneratorFacade {
         };
     }
 
-    public Flux<String> processAiAnswerStream(AiGeneratorService aiGeneratorService,String userMessage) {
-        TokenStream resTokens =  aiGeneratorService.generateCommonAnswerStream(userMessage);
+    public Flux<String> processAiAnswerStream(Long chatId,AiGeneratorService aiGeneratorService,String userMessage) {
+        TokenStream resTokens =  aiGeneratorService.generateCommonAnswerStream(chatId, userMessage);
         return processTokenStream(resTokens);
     }
 

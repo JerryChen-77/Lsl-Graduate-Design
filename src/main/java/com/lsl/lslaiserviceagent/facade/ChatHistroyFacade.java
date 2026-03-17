@@ -20,5 +20,5 @@ public interface ChatHistroyFacade {
     int loadChatHistoryToMemory(Long chatId, MessageWindowChatMemory chatMemory, int maxCount);
 
 
-    Flux<String> chat(Long chatId,String message,User loginUser);
+    Flux<String> chat(Long chatId,String message,User loginUser,String ip);
 }

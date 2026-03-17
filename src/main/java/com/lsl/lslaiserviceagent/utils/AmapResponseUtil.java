@@ -19,7 +19,7 @@ public class AmapResponseUtil {
             }
             
             AmapResponse response = objectMapper.readValue(jsonStr, AmapResponse.class);
-            
+            log.info("高德API响应: {}", response);
             // 验证必要字段
             if (response.getStatus() == null) {
                 return createErrorResponse("INVALID_RESPONSE", "响应格式错误");
