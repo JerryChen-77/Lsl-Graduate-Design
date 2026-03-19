@@ -29,6 +29,8 @@ import org.springframework.context.annotation.Lazy;
 import java.time.Duration;
 import java.util.List;
 
+import static com.lsl.lslaiserviceagent.constant.RagConstant.RAG_HTML_DIRECTORY_PATH;
+
 @Slf4j
 @Configuration
 public class AiGeneratorServiceFactory {
@@ -44,7 +46,7 @@ public class AiGeneratorServiceFactory {
 
     private static final String SEPERATOR = ":";
 
-    private static final String RAG_DIRECTORY_PATH = "src\\main\\resources\\rag_documents";
+
 
     public AiGeneratorService getAiCodeGeneratorService(long chatId,String ip) {
         // 通过缓存获取
@@ -68,7 +70,7 @@ public class AiGeneratorServiceFactory {
 
         // 1. 加载文档
 
-        List<Document> documents = FileSystemDocumentLoader.loadDocuments(RAG_DIRECTORY_PATH);
+        List<Document> documents = FileSystemDocumentLoader.loadDocuments(RAG_HTML_DIRECTORY_PATH);
 
         // 2. 创建内存向量存储，并使用内置ingestor处理文档（一切默认！）
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
