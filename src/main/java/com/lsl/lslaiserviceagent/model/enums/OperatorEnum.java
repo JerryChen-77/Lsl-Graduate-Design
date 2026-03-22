@@ -10,7 +10,7 @@ public enum OperatorEnum {
 
     ChinaMobile("ChinaMobile", "https://www.10086.cn/", "中国移动"),
     ChinaUnicom("ChinaUnicom", "https://mall.10010.com/", "中国联通"),
-    ChinaTelecom("ChinaTelecom", null, "中国电信");
+    ChinaTelecom("ChinaTelecom", "", "中国电信");
 
     private final String type;
 

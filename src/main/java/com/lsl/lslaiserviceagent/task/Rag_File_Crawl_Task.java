@@ -36,7 +36,7 @@ public class Rag_File_Crawl_Task {
             for (String url : URLS2CRAW) {
                 Parser parser = null;
                 String htmlFileUrl = null;
-                OperatorEnum operator = null;
+                OperatorEnum operator = OperatorEnum.getOperatorEnumByUrl(url);
                 if(StringUtils.isNotBlank(url)){
                     CrawlResult result = crawler.crawl(url);
                     if (result.isSuccess()) {
@@ -45,10 +45,9 @@ public class Rag_File_Crawl_Task {
                         log.info("   最终URL: " + result.getCurrentUrl());
                         log.info("   耗时: " + result.getDurationSeconds() + "秒");
                         // 4. 保存HTML到文件
-                        htmlFileUrl = crawler.saveHtmlToFile(result.getHtml(), result.getTitle());
+                        htmlFileUrl = crawler.saveHtmlToFile(result.getHtml(), operator.getName());
                     }
                 }else{
-                    operator = OperatorEnum.getOperatorEnumByUrl(url);
                     htmlFileUrl = RAG_HTML_DIRECTORY_PATH + File.separator + operator.getName() + HTML_TAIL;
                 }
                 String targetFileUrl = RAG_TXT_DIRECTORY_PATH + File.separator + operator.getName() + TXT_TAIL;
