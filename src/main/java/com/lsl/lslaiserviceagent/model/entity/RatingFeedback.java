@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 对话历史 实体类。
+ * 评分反馈表 实体类。
  *
  * @author SiLin li
  */
@@ -23,8 +23,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("chat_history")
-public class ChatHistory implements Serializable {
+@Table("rating_feedback")
+public class RatingFeedback implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -36,33 +36,23 @@ public class ChatHistory implements Serializable {
     private Long id;
 
     /**
-     * 消息
+     * 问题指纹
      */
-    private String message;
+    private String fingerprint;
 
     /**
-     * user/ai
-     */
-    @Column("messageType")
-    private String messageType;
-
-    /**
-     * 对话id
-     */
-    @Column("chatId")
-    private Long chatId;
-
-    /**
-     * 创建用户id
+     * 评分用户ID
      */
     @Column("userId")
     private Long userId;
 
+    @Column("chatId")
+    private Long chatId;
+
     /**
-     * 指纹
+     * 评分:1-5分
      */
-    @Column("fingerprint")
-    private String fingerprint;
+    private Integer rating;
 
     /**
      * 创建时间
@@ -81,11 +71,5 @@ public class ChatHistory implements Serializable {
      */
     @Column(value = "isDelete", isLogicDelete = true)
     private Integer isDelete;
-
-    /**
-     * 初始问题(仅ai回答会有father_id)
-     */
-    @Column(value="fatherId")
-    private Long fatherId;
 
 }

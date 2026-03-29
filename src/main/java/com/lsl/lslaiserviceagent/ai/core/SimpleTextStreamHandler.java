@@ -6,12 +6,14 @@ import com.lsl.lslaiserviceagent.model.enums.ChatHistoryMessageTypeEnum;
 import com.lsl.lslaiserviceagent.model.request.chathistory.ChatHistorySaveRequest;
 import com.lsl.lslaiserviceagent.service.ChatHistoryService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
 /**
  * 简单文本流处理器
  */
 @Slf4j
+@Component
 public class SimpleTextStreamHandler {
 
     /**
@@ -26,7 +28,7 @@ public class SimpleTextStreamHandler {
      */
     public Flux<String> handle(Flux<String> originFlux,
                                ChatHistoryService chatHistoryService,
-                               long chatId, User loginUser) {
+                               long chatId, User loginUser,long fatherId) {
         StringBuilder aiResponseBuilder = new StringBuilder();
         return originFlux
                 .map(chunk -> {
@@ -39,6 +41,7 @@ public class SimpleTextStreamHandler {
                     String aiResponse = aiResponseBuilder.toString();
                     ChatHistorySaveRequest req = ChatHistorySaveRequest.builder()
                             .chatId(chatId)
+                            .fatherId(fatherId)
                             .message(aiResponse)
                             .userId(loginUser.getId())
                             .messageType(ChatHistoryMessageTypeEnum.AI.getValue())
@@ -50,6 +53,7 @@ public class SimpleTextStreamHandler {
                     String errorMessage = "AI回复失败: " + error.getMessage();
                     ChatHistorySaveRequest req = ChatHistorySaveRequest.builder()
                             .chatId(chatId)
+                            .fatherId(fatherId)
                             .message(errorMessage)
                             .userId(loginUser.getId())
                             .messageType(ChatHistoryMessageTypeEnum.AI.getValue())

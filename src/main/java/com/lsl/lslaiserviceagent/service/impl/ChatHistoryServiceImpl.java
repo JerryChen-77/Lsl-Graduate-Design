@@ -10,7 +10,7 @@ import com.lsl.lslaiserviceagent.model.request.chathistory.ChatHistorySaveReques
 import com.lsl.lslaiserviceagent.model.vo.ChatMessageVO;
 import com.lsl.lslaiserviceagent.service.ChatHistoryService;
 import com.lsl.lslaiserviceagent.service.UserService;
-import com.lsl.lslaiserviceagent.utils.ThrowUtils;
+import com.lsl.lslaiserviceagent.utils.common.ThrowUtils;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
@@ -47,10 +47,12 @@ public class ChatHistoryServiceImpl extends ServiceImpl<ChatHistoryMapper, ChatH
 
 
         ChatHistory chatHistory = ChatHistory.builder()
+                .fingerprint(request.getFingerPrint())
                 .chatId(request.getChatId())
                 .message(request.getMessage())
                 .messageType(messageTypeEnum.getValue())
                 .userId(request.getUserId())
+                .fatherId(request.getFatherId())
                 .build();
 
         boolean saveResult = this.save(chatHistory);
@@ -74,6 +76,13 @@ public class ChatHistoryServiceImpl extends ServiceImpl<ChatHistoryMapper, ChatH
             log.error("removeByChat清理对话历史失败", e);
         }
         return true;
+    }
+
+    @Override
+    public String getChatAnswer(Long fatherChatId) {
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .eq("fatherId",fatherChatId);
+        return this.getOne(queryWrapper).getMessage();
     }
 
     /**

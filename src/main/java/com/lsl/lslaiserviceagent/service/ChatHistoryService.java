@@ -25,5 +25,7 @@ public interface ChatHistoryService extends IService<ChatHistory> {
 
     boolean removeByChatId(Long chatId);
 
+    String getChatAnswer(Long fatherChatId);
+
     QueryWrapper getQueryWrapper(ChatHistoryQueryRequest chatHistoryQueryRequest);
 }

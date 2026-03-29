@@ -11,7 +11,7 @@ import com.lsl.lslaiserviceagent.mapper.ChatHistoryOriginalMapper;
 import com.lsl.lslaiserviceagent.model.entity.ChatHistoryOriginal;
 import com.lsl.lslaiserviceagent.model.enums.ChatHistoryMessageTypeEnum;
 import com.lsl.lslaiserviceagent.service.ChatHistoryOriginalService;
-import com.lsl.lslaiserviceagent.utils.ThrowUtils;
+import com.lsl.lslaiserviceagent.utils.common.ThrowUtils;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;

@@ -1,4 +1,4 @@
-package com.lsl.lslaiserviceagent.utils;
+package com.lsl.lslaiserviceagent.utils.common;
 
 import com.lsl.lslaiserviceagent.common.BaseResponse;
 import com.lsl.lslaiserviceagent.exception.ErrorCode;

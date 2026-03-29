@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.lsl.lslaiserviceagent.constant.RagConstant.*;
@@ -26,7 +25,7 @@ public class Rag_File_Crawl_Task {
     /**
      * TODO 当前一分钟执行一次，为了方便测试
      */
-    @PostConstruct
+//    @PostConstruct
     public void executeCrawlTask() {
         AdvancedSeleniumCrawler crawler = new AdvancedSeleniumCrawler();
         try {

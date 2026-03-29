@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 public enum AiGenTypeEnum {
 
-    COMMON_CONVERSATION("普通对话模式", "common-conversation");
+    COMMON_CONVERSATION("普通对话模式", "common-conversation"),
+    CACHED_CONVERSATION("缓存模式","cache-model");
     private final String text;
     private final String value;
 

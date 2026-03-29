@@ -3,7 +3,7 @@ package com.lsl.lslaiserviceagent.aop;
 import com.lsl.lslaiserviceagent.common.BaseResponse;
 import com.lsl.lslaiserviceagent.exception.BusinessException;
 import com.lsl.lslaiserviceagent.exception.ErrorCode;
-import com.lsl.lslaiserviceagent.utils.ResultUtils;
+import com.lsl.lslaiserviceagent.utils.common.ResultUtils;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;

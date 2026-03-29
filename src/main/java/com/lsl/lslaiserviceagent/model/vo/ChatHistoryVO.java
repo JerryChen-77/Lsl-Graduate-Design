@@ -1,30 +1,22 @@
-package com.lsl.lslaiserviceagent.model.entity;
+package com.lsl.lslaiserviceagent.model.vo;
 
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
-import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import java.io.Serial;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 对话历史 实体类。
- *
- * @author SiLin li
- */
+import java.io.Serial;
+import java.time.LocalDateTime;
+
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("chat_history")
-public class ChatHistory implements Serializable {
+public class ChatHistoryVO {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -87,5 +79,7 @@ public class ChatHistory implements Serializable {
      */
     @Column(value="fatherId")
     private Long fatherId;
+
+    private Integer rates;
 
 }

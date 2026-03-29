@@ -13,11 +13,13 @@ import com.lsl.lslaiserviceagent.model.entity.ChatHistory;
 import com.lsl.lslaiserviceagent.model.entity.ChatTopic;
 import com.lsl.lslaiserviceagent.model.entity.User;
 import com.lsl.lslaiserviceagent.model.request.chathistory.ChatHistoryQueryRequest;
+import com.lsl.lslaiserviceagent.model.vo.ChatHistoryVO;
 import com.lsl.lslaiserviceagent.service.ChatTopicService;
+import com.lsl.lslaiserviceagent.service.RatingFeedbackService;
 import com.lsl.lslaiserviceagent.service.UserService;
 import com.lsl.lslaiserviceagent.utils.IpUtils;
-import com.lsl.lslaiserviceagent.utils.ResultUtils;
-import com.lsl.lslaiserviceagent.utils.ThrowUtils;
+import com.lsl.lslaiserviceagent.utils.common.ResultUtils;
+import com.lsl.lslaiserviceagent.utils.common.ThrowUtils;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +51,9 @@ public class ChatHistoryController {
     @Autowired
     private ChatTopicService chatTopicService;
 
+    @Autowired
+    private RatingFeedbackService ratingFeedbackService;
+
     @Resource
     private IpUtils ipUtils;
     /**
@@ -75,13 +80,14 @@ public class ChatHistoryController {
      * @return 对话历史分页
      */
     @GetMapping("/history/{chatId}")
-    public BaseResponse<Page<ChatHistory>> listChatHistory(@PathVariable Long chatId,
+    public BaseResponse<Page<ChatHistoryVO>> listChatHistory(@PathVariable Long chatId,
                                                            @RequestParam(defaultValue = "10") int pageSize,
                                                            @RequestParam(required = false) LocalDateTime lastCreateTime,
                                                            HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         Page<ChatHistory> result = chatHistroyFacade.listAppChatHistoryByPage(chatId, pageSize, lastCreateTime, loginUser);
-        return ResultUtils.success(result);
+        Page<ChatHistoryVO> wrappedResList = ratingFeedbackService.wrapChatHistory(result);
+        return ResultUtils.success(wrappedResList);
     }
 
     /**
@@ -92,12 +98,13 @@ public class ChatHistoryController {
      */
     @PostMapping("/admin/list/page/vo")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<ChatHistory>> listAllChatHistoryByPageForAdmin(@RequestBody ChatHistoryQueryRequest chatHistoryQueryRequest) {
+    public BaseResponse<Page<ChatHistoryVO>> listAllChatHistoryByPageForAdmin(@RequestBody ChatHistoryQueryRequest chatHistoryQueryRequest) {
         ThrowUtils.throwIf(chatHistoryQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long pageNum = chatHistoryQueryRequest.getPageNum();
         long pageSize = chatHistoryQueryRequest.getPageSize();
         Page<ChatHistory> result = chatHistroyFacade.listAllChatHistoryByPageForAdmin(pageNum, pageSize, chatHistoryQueryRequest);
-        return ResultUtils.success(result);
+        Page<ChatHistoryVO> wrappedResList = ratingFeedbackService.wrapChatHistory(result);
+        return ResultUtils.success(wrappedResList);
     }
 
     /**

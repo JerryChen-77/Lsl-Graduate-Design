@@ -1,7 +1,7 @@
 package dev.langchain4j.model.chat.response;
 
 import com.lsl.lslaiserviceagent.exception.ErrorCode;
-import com.lsl.lslaiserviceagent.utils.ThrowUtils;
+import com.lsl.lslaiserviceagent.utils.common.ThrowUtils;
 
 import java.util.Objects;
 

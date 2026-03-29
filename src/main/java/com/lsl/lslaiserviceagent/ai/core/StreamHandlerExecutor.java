@@ -23,6 +23,8 @@ public class StreamHandlerExecutor {
     @Resource
     private JsonMessageStreamHandler jsonMessageStreamHandler;
 
+    @Resource
+    private SimpleTextStreamHandler simpleTextStreamHandler;
     /**
      * 创建流处理器并处理聊天历史记录
      *
@@ -36,10 +38,12 @@ public class StreamHandlerExecutor {
     public Flux<String> doExecute(Flux<String> originFlux,
                                   ChatHistoryService chatHistoryService,
                                   ChatHistoryOriginalService chatHistoryOriginalService,
-                                  long chatId, User loginUser, AiGenTypeEnum typeEnum) {
+                                  long chatId, User loginUser, AiGenTypeEnum typeEnum,long fatherId) {
         return switch (typeEnum) {
             case COMMON_CONVERSATION-> // 使用注入的组件实例
-                    jsonMessageStreamHandler.handle(originFlux, chatHistoryService,chatHistoryOriginalService, chatId, loginUser);
+                    jsonMessageStreamHandler.handle(originFlux, chatHistoryService,chatHistoryOriginalService, chatId, loginUser, fatherId);
+            case CACHED_CONVERSATION ->
+                    simpleTextStreamHandler.handle(originFlux, chatHistoryService,chatId,loginUser,fatherId);
             default -> Flux.empty();
         };
     }

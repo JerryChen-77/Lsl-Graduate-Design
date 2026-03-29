@@ -29,10 +29,14 @@ public class ChatHistorySaveRequest implements Serializable {
      */
     private String messageType;
 
+    private String fingerPrint;
+
     /**
      * 操作用户 id（由切面注入）
      */
     private Long userId;
+
+    private Long fatherId;
 }
 
 

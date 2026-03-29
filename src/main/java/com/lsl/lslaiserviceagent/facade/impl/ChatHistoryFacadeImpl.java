@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import com.lsl.lslaiserviceagent.ai.core.StreamHandlerExecutor;
 import com.lsl.lslaiserviceagent.ai.service.AiGeneratorFacade;
 import com.lsl.lslaiserviceagent.constant.UserConstant;
-import com.lsl.lslaiserviceagent.exception.BusinessException;
 import com.lsl.lslaiserviceagent.exception.ErrorCode;
 import com.lsl.lslaiserviceagent.facade.ChatHistroyFacade;
 import com.lsl.lslaiserviceagent.model.entity.ChatHistory;
@@ -18,17 +17,19 @@ import com.lsl.lslaiserviceagent.model.request.chathistory.ChatHistorySaveReques
 import com.lsl.lslaiserviceagent.service.ChatHistoryOriginalService;
 import com.lsl.lslaiserviceagent.service.ChatHistoryService;
 import com.lsl.lslaiserviceagent.service.ChatTopicService;
-import com.lsl.lslaiserviceagent.utils.ThrowUtils;
+import com.lsl.lslaiserviceagent.service.QuestionFingerprintService;
+import com.lsl.lslaiserviceagent.service.impl.QuestionFingerprintServiceImpl;
+import com.lsl.lslaiserviceagent.utils.common.ThrowUtils;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -41,6 +42,9 @@ public class ChatHistoryFacadeImpl implements ChatHistroyFacade {
 
     @Autowired
     private ChatHistoryOriginalService chatHistoryOriginalService;
+
+    @Autowired
+    private QuestionFingerprintService questionFingerprintService;
 
     @Autowired
     private AiGeneratorFacade aiGeneratorFacade;
@@ -96,15 +100,27 @@ public class ChatHistoryFacadeImpl implements ChatHistroyFacade {
         ThrowUtils.throwIf(chatId == null||chatId<0, ErrorCode.NOT_FOUND_ERROR, "对话不存在");
         // 校验完成后保存用户对话
         ChatHistorySaveRequest chatHistorySaveRequest = ChatHistorySaveRequest.builder()
+                .fingerPrint(questionFingerprintService.genFingerPrint(message))
                 .chatId(chatId)
                 .message(message)
                 .messageType(ChatHistoryMessageTypeEnum.USER.getValue())
                 .userId(loginUser.getId())
                 .build();
-        chatHistoryService.saveChatMessage(chatHistorySaveRequest);
+
+        Long fatherId = chatHistoryService.saveChatMessage(chatHistorySaveRequest);
         chatHistoryOriginalService.addOriginalChatMessage(chatId,message, ChatHistoryMessageTypeEnum.USER.getValue(), loginUser.getId());
+        // 先为问题进行标准化，生成指纹等等
+        String cachedAnswer = questionFingerprintService.saveUserQuestion(message, loginUser.getId());
+
         // AI生成对话
-        Flux<String> originFlux = aiGeneratorFacade.generateAiAnswerStream(chatId, message, AiGenTypeEnum.COMMON_CONVERSATION,ip);
-        return streamHandlerExecutor.doExecute(originFlux,chatHistoryService,chatHistoryOriginalService,chatId,loginUser,AiGenTypeEnum.COMMON_CONVERSATION);
+        // 先查缓存
+        Flux<String> originFlux;
+        if(StringUtils.isBlank(cachedAnswer)){
+            originFlux = aiGeneratorFacade.generateAiAnswerStream(chatId, message, AiGenTypeEnum.COMMON_CONVERSATION,ip);
+            return streamHandlerExecutor.doExecute(originFlux,chatHistoryService,chatHistoryOriginalService,chatId,loginUser,AiGenTypeEnum.COMMON_CONVERSATION,fatherId);
+        }else {
+            originFlux = Flux.just(cachedAnswer);
+            return streamHandlerExecutor.doExecute(originFlux,chatHistoryService,chatHistoryOriginalService,chatId,loginUser,AiGenTypeEnum.CACHED_CONVERSATION,fatherId);
+        }
     }
 }

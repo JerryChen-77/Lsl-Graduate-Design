@@ -14,7 +14,8 @@ public enum ErrorCode {
     FORBIDDEN_ERROR(40300, "禁止访问"),
     SYSTEM_ERROR(50000, "系统内部异常"),
     OPERATION_ERROR(50001, "操作失败"),
-    NO_CLIENT_IP_ERROR(60000,"IP解析失败" );
+    NO_CLIENT_IP_ERROR(60000,"IP解析失败" ),
+    REPEAT_RATE_ERROR(70000,"重复评分失败");
 
     /**
      * 状态码

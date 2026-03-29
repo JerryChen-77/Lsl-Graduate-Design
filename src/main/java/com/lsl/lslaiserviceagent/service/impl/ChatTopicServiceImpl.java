@@ -5,7 +5,7 @@ import com.lsl.lslaiserviceagent.exception.ErrorCode;
 import com.lsl.lslaiserviceagent.mapper.ChatTopicMapper;
 import com.lsl.lslaiserviceagent.model.entity.ChatTopic;
 import com.lsl.lslaiserviceagent.service.ChatTopicService;
-import com.lsl.lslaiserviceagent.utils.ThrowUtils;
+import com.lsl.lslaiserviceagent.utils.common.ThrowUtils;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
