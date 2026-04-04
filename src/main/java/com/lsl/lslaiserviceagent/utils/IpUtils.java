@@ -95,6 +95,7 @@ public class IpUtils {
     public AmapResponse getAddressByIp(String ip) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("key", amap_key);
+        //"114.247.50.2" 北京ip
         params.put("ip", ip);
 
         try {
